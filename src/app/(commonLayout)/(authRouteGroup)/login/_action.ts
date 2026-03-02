@@ -6,7 +6,7 @@ import { ApiErrorResponse, ILoginPayloadType } from "@/types/api.types";
 import { ILoginResponse } from "@/types/auth.types";
 import { authValidationSchema } from "@/zod/auth.validation";
 
-export const createLogin = async (payload: ILoginPayloadType):Promise<ILoginResponse|ApiErrorResponse> => {
+export const createLoginAction = async (payload: ILoginPayloadType):Promise<ILoginResponse|ApiErrorResponse> => {
   try {
     const parsePayload: any =
       authValidationSchema.loginSchema.safeParse(payload);
