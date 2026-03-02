@@ -14,7 +14,7 @@ export default async function ConsultationPage() {
 
   await queryClient.prefetchQuery({
     queryKey: ['doctors'],
-    queryFn: getDoctorData,
+    queryFn: ()=>getDoctorData(),
   })
 
   return (

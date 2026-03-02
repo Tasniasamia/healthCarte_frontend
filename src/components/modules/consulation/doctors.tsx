@@ -3,9 +3,9 @@ import { getDoctorData } from "@/app/(commonLayout)/consulation/_action"
 import { useQuery } from "@tanstack/react-query"
 
 export function Posts() {
-    const { data, isLoading, isError } = useQuery<[]>({
+    const { data, isLoading, isError } = useQuery<any[]>({
       queryKey: ['doctors'],
-      queryFn: getDoctorData,
+      queryFn: ()=>getDoctorData(),
     })
   
     if (isLoading) return <p>Loading...</p>
@@ -13,11 +13,11 @@ export function Posts() {
   console.log("data",data)
     return (
       <ul>
-        {/* {data?.map((doctor) => (
+        {data?.map((doctor:any) => (
           <li key={doctor.id}>
             {doctor.name} — {doctor.specialty}
           </li>
-        ))} */}
+        ))}
       </ul>
     )
   }
