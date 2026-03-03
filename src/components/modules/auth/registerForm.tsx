@@ -1,5 +1,5 @@
 "use client";
-import { createLoginAction } from "@/app/(commonLayout)/(authRouteGroup)/login/_action";
+import { createRegisterAction } from "@/app/(commonLayout)/(authRouteGroup)/register/_actions";
 import AppField from "@/components/shared/form/AppField";
 import AppSubmitButton from "@/components/shared/form/AppSubmitButton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,25 +11,26 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { ApiErrorResponse } from "@/types/api.types";
-import { ILoginPayloadType, ILoginResponse } from "@/types/auth.types";
+import { ILoginPayloadType,  IRegisterPayloadType, IRegisterResponse } from "@/types/auth.types";
 import { authValidationSchema } from "@/zod/auth.validation";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const { mutateAsync, isPending } = useMutation<
-    ILoginResponse | ApiErrorResponse,
+    IRegisterResponse | ApiErrorResponse,
     Error,
-    ILoginPayloadType
+    IRegisterPayloadType
   >({
-    mutationFn: (values: ILoginPayloadType) => createLoginAction(values),
+    mutationFn: (values: IRegisterPayloadType) => createRegisterAction(values),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
@@ -37,22 +38,22 @@ const LoginForm = () => {
 
   const form = useForm({
     defaultValues: {
+      name:"",
       email: "",
       password: "",
     },
     onSubmit: async ({ value }: { value: ILoginPayloadType }) => {
       try {
         setServerError(null);
-        const loginResponse: any = await mutateAsync(value as any);
+        const registerResponse: any = await mutateAsync(value as any);
 
-        if (!loginResponse.success) {
-            console.log("coming here");
-            console.log("loginResponse not success: " , loginResponse?.message)
-          setServerError(loginResponse?.message);
+        if (!registerResponse.success) {
+ 
+          setServerError(registerResponse?.message);
           return;
-        }
+        }  
+        toast.success('Please verify your email');
       } catch (error: any) {
-        console.log("catch message",error?.message)
         setServerError(error?.message);
       }
     },
@@ -65,7 +66,7 @@ const LoginForm = () => {
             Welcome Back 👋
           </h1>
           <p className="text-center text-gray-500 text-sm mt-1">
-            Please login to your account
+            Please create  your account
           </p>
         </CardHeader>
 
@@ -81,10 +82,30 @@ const LoginForm = () => {
             }}
             className="space-y-4"
           >
+                 <form.Field
+              name="name"
+              validators={{
+                onChange: authValidationSchema.registerSchema.shape.name,
+              }}
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <AppField
+                    field={field}
+                    label="Name"
+                    type="text"
+                    placeholder="Enter your name "
+                    className="p-3"
+                    // disabled
+                  />
+                );
+              }}
+            />
             <form.Field
               name="email"
               validators={{
-                onChange: authValidationSchema.loginSchema.shape.email,
+                onChange: authValidationSchema.registerSchema.shape.email,
               }}
               children={(field) => {
                 const isInvalid =
@@ -104,7 +125,7 @@ const LoginForm = () => {
             <form.Field
               name="password"
               validators={{
-                onChange: authValidationSchema.loginSchema.shape.password,
+                onChange: authValidationSchema.registerSchema.shape.password,
               }}
               children={(field) => {
                 const isInvalid =
@@ -139,15 +160,7 @@ const LoginForm = () => {
                 );
               }}
             />
-            {/* Forget Password */}
-            <div className="text-right">
-              <Link
-                href="/forget-password"
-                className="text-sm text-blue-600 hover:underline"
-              >
-                Forgot Password?
-              </Link>
-            </div>
+    
 
             {serverError && (
               <Alert>
@@ -160,10 +173,10 @@ const LoginForm = () => {
               children={([canSubmit, isSubmitting]) => (
                 <>
                   <AppSubmitButton
-                    isPending={isSubmitting || isPending} pendingLabel="Logging In ..."
+                    isPending={isSubmitting || isPending} pendingLabel="Creating User ..."
                     disabled={!canSubmit}
                   >
-                    Login
+                    Register
                   </AppSubmitButton>
                 </>
               )}
@@ -178,18 +191,18 @@ const LoginForm = () => {
             // window.location.href=`http://localhost:5050/api/v1/auth/login/google`
           }}
         >
-          Sign In With Google
+          Sign Up With Google
         </Button>
         </CardContent>
  
         <CardFooter className="justify-center pb-5">
           <p className="text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
+            Aready have an account?{" "}
             <Link
               href="/register"
               className="text-blue-600 font-medium hover:underline"
             >
-              Register here
+              login here
             </Link>
           </p>
         </CardFooter>
@@ -198,4 +211,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm;

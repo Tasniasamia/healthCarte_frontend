@@ -2,8 +2,8 @@
 
 import { httpClient } from "@/lib/axios/httpClient";
 import { setTokenInCookie } from "@/lib/token.utils";
-import { ApiErrorResponse, ILoginPayloadType } from "@/types/api.types";
-import { ILoginResponse } from "@/types/auth.types";
+import { ApiErrorResponse } from "@/types/api.types";
+import { ILoginPayloadType, ILoginResponse } from "@/types/auth.types";
 import { authValidationSchema } from "@/zod/auth.validation";
 
 export const createLoginAction = async (payload: ILoginPayloadType):Promise<ILoginResponse|ApiErrorResponse> => {

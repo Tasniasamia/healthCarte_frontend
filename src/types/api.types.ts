@@ -20,4 +20,3 @@ export interface ApiErrorResponse{
     message:string
 }
 
-export type ILoginPayloadType=z.infer<typeof authValidationSchema.loginSchema>
