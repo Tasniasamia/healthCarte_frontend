@@ -21,15 +21,18 @@ export const createLoginAction = async (payload: ILoginPayloadType):Promise<ILog
       payload
     );
     const { accessToken, refreshToken, token } = await response.data;
-    await setTokenInCookie("accessToken", accessToken);
-    await setTokenInCookie("refreshToken", refreshToken);
+    console.log("response",response?.data);
+    await setTokenInCookie("accessToken", accessToken,(process?.env.ACCESS_TOKEN_SECRET as string));
+    await setTokenInCookie("refreshToken", refreshToken,(process?.env.REFRESH_TOKEN_SECRET as string));
     await setTokenInCookie("better-auth.session_token", token);
-
     return response.data;
   } catch (error: any) {
+    console.log("error:any",error?.message);
     return {
       success: false,
       message: `Login failed: ${error?.message}`,
     };
   }
 };
+
+
