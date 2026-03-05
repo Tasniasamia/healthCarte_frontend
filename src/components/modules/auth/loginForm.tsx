@@ -19,7 +19,8 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
-const LoginForm = () => {
+const LoginForm = ({redirect}:{redirect?:string|object}) => {
+  console.log("redirect",redirect);
   const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -29,7 +30,7 @@ const LoginForm = () => {
     Error,
     ILoginPayloadType
   >({
-    mutationFn: (values: ILoginPayloadType) => createLoginAction(values),
+    mutationFn: (values: ILoginPayloadType) => createLoginAction(values,redirect as string),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },

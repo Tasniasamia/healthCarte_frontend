@@ -10,15 +10,15 @@ const accessToken=req.cookies.get('accessToken')?.value;
 let userRole:string | undefined;
 const verifyAccessToken=await verifyToken(accessToken as string,process.env.ACCESS_TOKEN_SECRET as string)  ;
 if(verifyAccessToken){
-userRole=verifyAccessToken?.role;
+userRole=verifyAccessToken?.role === 'SUPER_ADMIN'?'ADMIN':verifyAccessToken?.role;
 }
 const routeowner=await routeOwner(pathname as string);
 if(routeowner === null){
   return NextResponse.next();
 }
 if(!accessToken){
-  let loginURL=new URL('/login');
-  loginURL.searchParams.set('redirect',pathname)
+  let loginURL = new URL('/login', req.url);
+   loginURL.searchParams.set('redirect',pathname)
 return NextResponse.redirect(loginURL)
 }
 if(routeowner === 'COMMON'){
@@ -26,7 +26,7 @@ if(routeowner === 'COMMON'){
 
 }
 if(routeowner !== userRole ){
- return NextResponse.redirect(new URL(defaultRoute(userRole as string)))
+ return NextResponse.redirect(new URL(defaultRoute(userRole as string),req?.url))
 }
 return NextResponse.next();
 }

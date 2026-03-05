@@ -62,7 +62,7 @@ export const isMatchRoute=(path:string,routeConfig:RouteConfigType)=>{
   }
 
   export const defaultRoute=(role:string)=>{
-    if(role==="ADMIN"){
+    if((role==="ADMIN") || (role==="SUPER_ADMIN")){
         return '/admin/dashboard'
     }
     if(role==="DOCTOR"){
@@ -75,3 +75,14 @@ export const isMatchRoute=(path:string,routeConfig:RouteConfigType)=>{
 
     return '/'
   }
+
+
+  export const isValidRedirect=(path:string,role:string)=>{
+   const routeowner= routeOwner(path);
+   if(routeowner === role){
+    return true;
+   }
+   return false;
+  }
+
+  
