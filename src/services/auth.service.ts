@@ -1,9 +1,11 @@
+import { verifyToken } from "@/lib/jwtUtils";
 import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
 
 export const getNewTokens = async (refreshToken: string) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh-token`,
+      `http://localhost:5050/api/v1/auth/refresh-token`,
       {
         method: "GET",
         headers: { Cookie: `refreshToken=${refreshToken}` },
@@ -22,31 +24,72 @@ export const getNewTokens = async (refreshToken: string) => {
   }
 };
 
-export async function getUserInfo() {
+// export async function getUserInfo() {
+//   try {
+//       const cookieStore = await cookies();
+//       const accessToken = cookieStore.get("accessToken")?.value;
+//       console.log("accessToken",accessToken)
+
+//       if (!accessToken) {
+//           return null;
+//       }
+
+//       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
+//           method: "GET",
+//           headers: {
+//               "Content-Type": "application/json",
+//               Cookie: `accessToken=${accessToken}`
+//           }
+//       });
+//       console.log("res",res);
+
+//       if (!res.ok) {
+//           console.error("Failed to fetch user info:", res.status, res.statusText);
+//           return null;
+//       }
+
+//       const { data } = await res.json();
+//       console.log("data",data);
+
+//       return data;
+//   } catch (error) {
+//       console.error("Error fetching user info:", error);
+//       return null;
+//   }
+// }
+// auth.service.ts
+export async function getUserInfo(req: NextRequest) {
   try {
-      const cookieStore = await cookies();
-      const accessToken = cookieStore.get("accessToken")?.value;
+      const accessToken = req.cookies.get("accessToken")?.value;
+      console.log("accessToken",accessToken);
+      if (!accessToken) return null;
 
-      if (!accessToken) {
-          return null;
-      }
+      // Token verify করুন আগে
+      const verified = await verifyToken(
+        accessToken, 
+        process.env.ACCESS_TOKEN_SECRET as string
+      );
+      
+      if (!verified) return null; // ← expired token দিয়ে call করবে না
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
+      const res = await fetch(`http://localhost:5050/api/v1/auth/me`, {
           method: "GET",
           headers: {
               "Content-Type": "application/json",
               Cookie: `accessToken=${accessToken}`
           }
       });
-
+console.log("res",res);
       if (!res.ok) {
-          console.error("Failed to fetch user info:", res.status, res.statusText);
+          const errorBody = await res.json();
+          console.error("Error body:", errorBody);
           return null;
       }
 
       const { data } = await res.json();
-
+      console.log("data",data);
       return data;
+
   } catch (error) {
       console.error("Error fetching user info:", error);
       return null;

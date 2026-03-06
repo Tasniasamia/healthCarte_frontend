@@ -48,7 +48,7 @@ if((await isAuthRoute(pathname)) && verifyAccessToken){
     return NextResponse.next();
   }
 
-  const user = await getUserInfo();
+  const user = await getUserInfo(req);
   if (user?.needPasswordChanges) {
     return NextResponse.next();
   }
@@ -109,12 +109,18 @@ if((await isAuthRoute(pathname)) && verifyAccessToken){
 
 //Rule-4
 
-if(accessToken){
-  const user = await getUserInfo();
+if(accessToken && verifyAccessToken){
+  const user = await getUserInfo(req);
   if(user){
 
+    console.log("user",user);
     if(user.emailVerified === false){
-      if(pathname !== "/verify-email"){
+      // if(!user?.emailVerified && (pathname === "/verify-email")){
+      //   const verifyEmailUrl = new URL("/verify-email", req.url);
+      //   verifyEmailUrl.searchParams.set("email", user?.email);
+      //   return NextResponse.redirect(verifyEmailUrl);
+      // }
+      if((pathname !== "/verify-email") ){
           const verifyEmailUrl = new URL("/verify-email", req.url);
           verifyEmailUrl.searchParams.set("email", user?.email);
           return NextResponse.redirect(verifyEmailUrl);
