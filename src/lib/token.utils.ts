@@ -1,6 +1,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { setCookie } from './cookies.utils';
-// const jwtSecret=process.env.NEXT_PUBLIC_JWT_TOKEN_SECRET as string
+
+
 export const getRemaingSecondsToken=(token:string,jwtSecret:string):number=>{
 
 if(!token || !jwtSecret){ return 0;}
@@ -32,3 +33,14 @@ export const setTokenInCookie = async (
   
     await setCookie(name, token, maxAgeInSeconds);
   };
+
+
+  export const isWillExpiredSoon=(accessToken:string,time=300)=>{
+    const remainingTime=getRemaingSecondsToken(accessToken,process.env.ACCESS_TOKEN_SECRET as string);
+    return remainingTime>0 && remainingTime<=time;
+  }
+
+  export const isExpired=(accessToken:string,time=300)=>{
+  const remainingTime=getRemaingSecondsToken(accessToken,process.env.ACCESS_TOKEN_SECRET as string);
+   return remainingTime === 0;
+  }

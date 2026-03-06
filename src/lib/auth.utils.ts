@@ -1,4 +1,4 @@
-export const authRoute=['/login','/register','/forget-password','/reset-password','/verify-email'];
+export const authRoute=['/login','/register','/forget-password','/verify-email'];
 
 export const isAuthRoute=(path:string)=>{
 return    authRoute.some((route)=>route==path)

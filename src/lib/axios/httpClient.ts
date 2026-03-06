@@ -1,19 +1,65 @@
 import { ApiResponse } from "@/types/api.types";
 import axios from "axios";
+import { isWillExpiredSoon, setTokenInCookie } from "../token.utils";
+import { cookies, headers } from "next/headers";
+import { getNewTokens } from "@/services/auth.service";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 if(!API_BASE_URL) {
     throw new Error('API_BASE_URL is not defined in environment variables');
 }
-const axiosInstance =()=>{
-  return axios.create({
-    baseURL: API_BASE_URL,
-    timeout: 30000,
-    headers:{
-      'Content-Type' : 'application/json',
+
+async function tryRefreshToken(
+  accessToken: string,
+  refreshToken: string
+): Promise<void>
+{
+  if(!isWillExpiredSoon(accessToken)) {
+      return;
   }
-  });
+
+  const requestHeader = await headers();
+
+  if (requestHeader.get("x-token-refreshed") === "1") {
+      return; // avoid multiple refresh attempts in the same request lifecycle
+  }
+
+  try {
+     const tokenData=await getNewTokens(refreshToken);
+      await setTokenInCookie("accessToken", tokenData?.accessToken,(process?.env.ACCESS_TOKEN_SECRET as string));
+      await setTokenInCookie("refreshToken", tokenData?.refreshToken,(process?.env.REFRESH_TOKEN_SECRET as string));
+      await setTokenInCookie("better-auth.session_token", tokenData?.sessionToken);
+
+  } catch (error : any) {
+      console.error("Error refreshing token in http client:", error);
+  }
+}
+const axiosInstance = async () => {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+    const refreshToken = cookieStore.get("refreshToken")?.value;
+
+    if(accessToken && refreshToken){
+        await tryRefreshToken(accessToken, refreshToken);
+    }
+
+    const cookieHeader = cookieStore
+                                .getAll()
+                                .map((cookie) => `${cookie.name}=${cookie.value}`)
+                                .join("; ");    
+    // eg Cookie: "accessToken=abc123; refreshToken=def456"
+
+    const instance = axios.create({
+        baseURL : API_BASE_URL,
+        timeout : 30000,
+        headers:{
+            'Content-Type' : 'application/json',
+            Cookie : cookieHeader
+        }
+    })
+
+    return instance;
 }
 
 
@@ -23,8 +69,9 @@ export interface ApiRequestOptions {
 }
 
 const httpGet = async <TData>(endPoint: string, options?: ApiRequestOptions):Promise<ApiResponse<TData>> => {
-  try {        
-    const response = await axiosInstance().get<ApiResponse<TData>>(endPoint, {
+  try { 
+    const instance = await axiosInstance();         
+    const response = await instance.get<ApiResponse<TData>>(endPoint, {
         params: options?.params,
         headers: options?.headers,
     });
@@ -40,8 +87,9 @@ const httpPost = async <TData>(
   payload: Record<string, any>,
   options?: ApiRequestOptions
 ):Promise<ApiResponse<TData>> => {
-  try {        
-    const response = await axiosInstance().post<ApiResponse<TData>>(endPoint,payload,{
+  try {    
+    const instance = await axiosInstance();       
+    const response = await instance.post<ApiResponse<TData>>(endPoint,payload,{
         params: options?.params,
         headers: options?.headers,
     });
