@@ -3,7 +3,7 @@ import { verifyToken } from "./lib/jwtUtils";
 import { JwtPayload } from "jsonwebtoken";
 import { defaultRoute, isAuthRoute, routeOwner } from "./lib/auth.utils";
 import { isExpired, isWillExpiredSoon } from "./lib/token.utils";
-import { getNewTokens } from "./services/auth.service";
+import { getNewTokens, getUserInfo } from "./services/auth.service";
 
 export const refreshTokenMiddleware=async(rereshToken:string)=>{
 try{
@@ -33,8 +33,34 @@ if((await isAuthRoute(pathname)) && verifyAccessToken){
   return NextResponse.redirect(new URL(defaultRoute(userRole as string), req.url));
  }
 
+//Rule-2
+ if (pathname === '/reset-password') {
+  const url = new URL(req.url);
+  const email = url.searchParams.get('email');
 
-//Rule-2 refresh token procedure
+  if (!email) {
+    const loginURL = new URL('/login', req.url);
+    loginURL.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginURL);
+  }
+
+  if (!accessToken) {
+    return NextResponse.next();
+  }
+
+  const user = await getUserInfo();
+  if (user?.needPasswordChanges) {
+    return NextResponse.next();
+  }
+
+  return NextResponse.redirect(new URL(defaultRoute(userRole as string), req.url));
+}
+
+
+
+
+
+//Rule-3 refresh token procedure
  if (verifyAccessToken && refreshToken && isWillExpiredSoon(accessToken as string)) {
   
   const requestHeaders = new Headers(req.headers);
@@ -81,15 +107,52 @@ if((await isAuthRoute(pathname)) && verifyAccessToken){
 
 
 
+//Rule-4
+
+if(accessToken){
+  const user = await getUserInfo();
+  if(user){
+
+    if(user.emailVerified === false){
+      if(pathname !== "/verify-email"){
+          const verifyEmailUrl = new URL("/verify-email", req.url);
+          verifyEmailUrl.searchParams.set("email", user?.email);
+          return NextResponse.redirect(verifyEmailUrl);
+      }
+
+      return NextResponse.next();
+  }
+
+  if(user.emailVerified && pathname === "/verify-email"){
+      return NextResponse.redirect(new URL(defaultRoute(userRole as string), req.url));
+  }
+
+
+
+    if (user && user?.needPasswordChanges && (pathname !== '/reset-password')) {
+      return NextResponse.redirect(new URL('/reset-password',req.url));
+    }
+    if (user && !user?.needPasswordChanges && (pathname === '/reset-password')) {
+      return NextResponse.redirect(new URL(defaultRoute(userRole as string),req?.url))
+    }
+  }
+
+}
+
+
+
+
+
+
 
 
 const routeowner=await routeOwner(pathname as string);
-//Rule-3 if routeowner is null and not accesstoken , so he can redirect
+//Rule-4 if routeowner is null and not accesstoken , so he can redirect
 
-if((routeowner === null) && !accessToken){
+if((routeowner === null)){
   return NextResponse.next();
 }
-//Rule-4 if not accesstoken here. but trying to redirect protected route
+//Rule-5 if not accesstoken here. but trying to redirect protected route
 if(!accessToken){
   let loginURL = new URL('/login', req.url);
    loginURL.searchParams.set('redirect',pathname)
