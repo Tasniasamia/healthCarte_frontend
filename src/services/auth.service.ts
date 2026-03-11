@@ -20,40 +20,62 @@ export const getNewTokens = async (refreshToken: string) => {
     const { accessToken, refreshToken: newRefreshToken, sessionToken } = responseData?.data;
 
     return { accessToken, refreshToken: newRefreshToken, sessionToken };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    console.error("Error refreshing tokens:", error);
     return null;
   }
 };
 
 export async function getUserInfo() {
   try {
-      const cookieStore = await cookies();
-      const accessToken = cookieStore.get("accessToken")?.value;
-      console.log("accessToken",accessToken)
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
+    console.log("accessToken", accessToken);
 
-      if (!accessToken) {
-          return null;
+    if (!accessToken) {
+      return null;
+    }
+
+    // Optional: verify token on the frontend before calling backend
+    const verified = await verifyToken(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET as string
+    );
+    if (!verified) {
+      return null;
+    }
+
+    // Build a proper Cookie header from current cookies
+    const cookieHeader = cookieStore
+      .getAll()
+      .map((c) => `${c.name}=${c.value}`)
+      .join("; ");
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieHeader,
+        },
       }
-      // const allCookies = req.headers.get("cookie") || "";
+    );
+    console.log("res", res);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
-          method: "GET",
-          headers: {
-              "Content-Type": "application/json",
-              Cookie:JSON.stringify(cookieStore)
-          }
-      });
-      console.log("res",res);
+    if (!res.ok) {
+      console.error(
+        "Failed to fetch user info:",
+        res.status,
+        res.statusText
+      );
+      return null;
+    }
 
-      if (!res.ok) {
-          console.error("Failed to fetch user info:", res.status, res.statusText);
-          return null;
-      }
+    const { data } = await res.json();
+    console.log("data", data);
 
-      const { data } = await res.json();
-      console.log("data",data);
-
-      return data;
+    return data;
   } catch (error) {
       console.error("Error fetching user info:", error);
       return null;
