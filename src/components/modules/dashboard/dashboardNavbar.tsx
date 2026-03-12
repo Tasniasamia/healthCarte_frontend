@@ -10,7 +10,7 @@ const DashboardNavbar =async () => {
     const dashboardHome=defaultRoute(userInfo?.role as string);
     return (
         <div>
-            <DashboardNavbarContent userInfo={userInfo} role={userInfo?.role as string} dashboardHome={dashboardHome} />
+            <DashboardNavbarContent userInfo={userInfo} role={userInfo?.role} dashboardHome={dashboardHome} />
         </div>
     );
 };

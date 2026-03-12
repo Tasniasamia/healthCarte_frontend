@@ -1,11 +1,24 @@
-import React from 'react';
+// src/app/(commonLayout)/consulation/page.tsx
 
-const DoctorManagement = () => {
+import {
+    dehydrate,
+    HydrationBoundary,
+    QueryClient,
+  } from '@tanstack/react-query'
+import { getAllDoctors } from '@/services/doctor.service'
+import DoctorTable from '@/components/modules/admin/appointmentManagement/doctorTable'
+  
+  export default async function DoctorManagementPage() {
+    const queryClient = new QueryClient()
+  
+    await queryClient.prefetchQuery({
+      queryKey: ['doctors'],
+      queryFn: ()=>getAllDoctors(),
+    })
+  
     return (
-        <div>
-            
-        </div>
-    );
-};
-
-export default DoctorManagement;
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <DoctorTable />
+      </HydrationBoundary>
+    )
+  }

@@ -1,11 +1,14 @@
-"use server"
+"use server";
 
-import { httpClient } from "@/lib/axios/httpClient"
-import { PieChartData } from "@/types/dashboard.types"
+import { httpClient } from "@/lib/axios/httpClient";
+import { IAdminDashboardData } from "@/types/dashboard.types";
 
-
-
-export const getPieChartData = async () => {
-  const response = await httpClient.get<PieChartData[]>('/stats/pie-chart')
-  return response.data
-}
+export const getDashboardData = async () => {
+  try {
+    const response = await httpClient.get<IAdminDashboardData>("/stats");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch dashboard data", error);
+    throw error;
+  }
+};

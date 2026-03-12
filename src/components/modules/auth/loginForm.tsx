@@ -44,17 +44,22 @@ const LoginForm = ({redirect}:{redirect?:string|object}) => {
     onSubmit: async ({ value }: { value: ILoginPayloadType }) => {
       try {
         setServerError(null);
-        const loginResponse: any = await mutateAsync(value as any);
+        const loginResponse = await mutateAsync(value);
 
-        if (!loginResponse.success) {
-            console.log("coming here");
-            console.log("loginResponse not success: " , loginResponse?.message)
-          setServerError(loginResponse?.message);
+        if ("success" in loginResponse && !loginResponse.success) {
+          console.log("coming here");
+          console.log("loginResponse not success: ", loginResponse.message);
+          setServerError(loginResponse.message);
           return;
         }
-      } catch (error: any) {
-        console.log("catch message",error?.message)
-        setServerError(error?.message);
+      } catch (error: unknown) {
+        if (error && typeof error === "object" && "message" in error) {
+          console.log("catch message", (error as { message?: string }).message);
+          setServerError((error as { message?: string }).message ?? "An unexpected error occurred");
+        } else {
+          console.log("catch message", error);
+          setServerError("An unexpected error occurred");
+        }
       }
     },
   });
@@ -87,59 +92,51 @@ const LoginForm = ({redirect}:{redirect?:string|object}) => {
               validators={{
                 onChange: authValidationSchema.loginSchema.shape.email,
               }}
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <AppField
-                    field={field}
-                    label="Email Address"
-                    type="email"
-                    placeholder="Enter your email address"
-                    className="p-3"
-                    // disabled
-                  />
-                );
-              }}
-            />
+            >
+              {(field) => (
+                <AppField
+                  field={field}
+                  label="Email Address"
+                  type="email"
+                  placeholder="Enter your email address"
+                  className="p-3"
+                />
+              )}
+            </form.Field>
             <form.Field
               name="password"
               validators={{
                 onChange: authValidationSchema.loginSchema.shape.password,
               }}
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <AppField
-                    field={field}
-                    aria-label={
-                      showPassword ? "Show Password" : "Hide Password"
-                    }
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    className="p-3"
-                    // disabled
-                    append={
-                        <Button
-                        type="button"  
-                        variant="ghost"
-                        size="icon"
-                        className="cursor-pointer"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="size-4" aria-hidden="true" />
-                        ) : (
-                          <Eye className="size-4" aria-hidden="true" />
-                        )}
-                      </Button>
-                    }
-                  />
-                );
-              }}
-            />
+            >
+              {(field) => (
+                <AppField
+                  field={field}
+                  aria-label={
+                    showPassword ? "Show Password" : "Hide Password"
+                  }
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className="p-3"
+                  append={
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="cursor-pointer"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="size-4" aria-hidden="true" />
+                      ) : (
+                        <Eye className="size-4" aria-hidden="true" />
+                      )}
+                    </Button>
+                  }
+                />
+              )}
+            </form.Field>
             {/* Forget Password */}
             <div className="text-right">
               <Link
@@ -158,17 +155,17 @@ const LoginForm = ({redirect}:{redirect?:string|object}) => {
 
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
-                <>
-                  <AppSubmitButton
-                    isPending={isSubmitting || isPending} pendingLabel="Logging In ..."
-                    disabled={!canSubmit}
-                  >
-                    Login
-                  </AppSubmitButton>
-                </>
+            >
+              {([canSubmit, isSubmitting]) => (
+                <AppSubmitButton
+                  isPending={isSubmitting || isPending}
+                  pendingLabel="Logging In ..."
+                  disabled={!canSubmit}
+                >
+                  Login
+                </AppSubmitButton>
               )}
-            />
+            </form.Subscribe>
           </form>
           <Button
           variant="outline"

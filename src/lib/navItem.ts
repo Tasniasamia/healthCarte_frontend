@@ -118,6 +118,7 @@ export const getAdminNavItems = ():INavItem[] => {
                     href: "/admin/dashboard/specialties-management",
                     icon: "Hospital",
                 },
+          
                 {
                     label: "Doctor Schedules",
                     href: "/admin/dashboard/doctor-schedules-managament",
