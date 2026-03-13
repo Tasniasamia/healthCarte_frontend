@@ -6,7 +6,7 @@ import {
     QueryClient,
   } from '@tanstack/react-query'
 import { getAllDoctors } from '@/services/doctor.service'
-import DoctorTable from '@/components/modules/admin/appointmentManagement/doctorTable'
+import DoctorTable from '@/components/modules/admin/doctorManagement/doctorTable'
   
   export default async function DoctorManagementPage() {
     const queryClient = new QueryClient()

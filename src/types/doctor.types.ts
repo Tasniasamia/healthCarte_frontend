@@ -1,3 +1,6 @@
+import { JwtPayload } from "jsonwebtoken";
+import { IDoctorSpecialty } from "./speciality.types";
+
 export interface IDoctor {
         id: string;
         name: string;
@@ -18,5 +21,6 @@ export interface IDoctor {
         currentWorkingPlace: string;
         designation: string;
         avaerageRating: number;
-      
+       specialities : IDoctorSpecialty[];
+       user: JwtPayload;
 }
