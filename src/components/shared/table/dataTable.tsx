@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   ColumnDef,
   flexRender,
@@ -37,24 +38,32 @@ export default function DataTable<TData>({
   loading,
   emptyMessage,
 }: ICustomTableProps<TData>) {
-
   const actionColumn: ColumnDef<TData> = {
     id: "actions",
     header: "Actions",
-    cell: (info) => (
+    cell: (info): any => (
       <div className="flex gap-2">
         {actions?.onEdit && (
-          <button className="cursor-pointer" onClick={() => actions.onEdit?.(info.row.original)}>
+          <button
+            className="cursor-pointer"
+            onClick={() => actions.onEdit?.(info.row.original)}
+          >
             Edit
           </button>
         )}
         {actions?.onView && (
-          <button className="cursor-pointer" onClick={() => actions.onView?.(info.row.original)}>
+          <button
+            className="cursor-pointer"
+            onClick={() => actions.onView?.(info.row.original)}
+          >
             View
           </button>
         )}
         {actions?.onDelete && (
-          <button className="cursor-pointer" onClick={() => actions.onDelete?.(info.row.original)}>
+          <button
+            className="cursor-pointer"
+            onClick={() => actions.onDelete?.(info.row.original)}
+          >
             Delete
           </button>
         )}
@@ -90,7 +99,7 @@ export default function DataTable<TData>({
                   <TableHead key={header.id}>
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
                   </TableHead>
                 ))}
@@ -106,7 +115,7 @@ export default function DataTable<TData>({
                     <TableCell key={cell.id} className="p-4">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

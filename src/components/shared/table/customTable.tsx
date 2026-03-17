@@ -13,6 +13,7 @@ export default function CustomTable<T>({ data, columns }: ICustomTableProps<T>) 
     columns, 
     getCoreRowModel: getCoreRowModel() 
   })
+  
 
   return (
     <table>

@@ -8,59 +8,13 @@ import { ColumnDef } from '@tanstack/react-table'
 import { doctorColumn } from './doctorColumn'
 import DataTable from '@/components/shared/table/dataTable'
 
-const DoctorTable = () => {
+const DoctorTable = ({urlQuerires,searchQueries}:{urlQuerires:string,searchQueries:Record<string,string>}) => {
     const {data, isLoading, isError} = useQuery({
-      queryKey:['doctors'],
-      queryFn:() => getAllDoctors(),
+      queryKey:['doctors',searchQueries],
+      queryFn:() => getAllDoctors(urlQuerires),
     })
 
-    // if(isLoading) return <div>Loading...</div>
-    // if(isError) return <div>Error...</div>
-
-    // const doctorColumns: ColumnDef<IDoctor>[] = [
-    //   {
-    //     id: "id",
-    //     accessorKey: "id",
-    //     header: "ID",
-    //     cell: (info) => info.row.original.id,
-    //   },
-    //   {
-    //     id: "name",
-    //     accessorKey: "name",
-    //     header: "Name",
-    //     cell: (info) => info.row.original.name,
-    //   },
-    //   {
-    //     id: "email",
-    //     accessorKey: "email",
-    //     header: "Email",
-    //     cell: (info) => info.row.original.email,
-    //   },
-    //   {
-    //     id: "contactNumber",
-    //     accessorKey: "contactNumber",
-    //     header: "Contact Number",
-    //     cell: (info) => info.row.original.contactNumber,
-    //   },
-    //   {
-    //     id: "address",
-    //     accessorKey: "address",
-    //     header: "Address",
-    //     cell: (info) => info.row.original.address || "N/A",
-    //   },
-    //   { id: "registrationNumber",
-    //     accessorKey: "registrationNumber",
-    //     header: "Registration Number",
-    //     cell: (info) => info.row.original.registrationNumber,
-    //   },
-    //   {
-    //     id: "experience",
-    //     accessorKey: "experience",
-    //     header: "Experience",
-    //     cell: (info) => `${info.row.original.experience} years`,
-    //   },
-    // ]
-const handleEdit = (doctor: IDoctor) => {
+  const handleEdit = (doctor: IDoctor) => {
   console.log(doctor)
 }
 const handleView = (doctor: IDoctor) => {
