@@ -299,7 +299,7 @@ const buildResetPasswordURL = (baseUrl: string, email: string) => {
 export const proxy = async (req: NextRequest) => {
   const { pathname } = req?.nextUrl;
   const accessToken = req.cookies.get('accessToken')?.value;
-  const refreshToken = req.cookies.get("refreshToken")?.value;
+  const refreshToken = req.cookies.get("refreshToken")?.value as any;
 
   let userRole: string | undefined;
   const verifyAccessToken = await verifyToken(
@@ -352,9 +352,11 @@ export const proxy = async (req: NextRequest) => {
   // ============================================
   // Rule-3: Token expire হওয়ার আগে refresh
   // ============================================
-  if (verifyAccessToken && refreshToken && isWillExpiredSoon(accessToken as string)) {
+  if (verifyAccessToken || refreshToken || isWillExpiredSoon(accessToken as string)) {
+    console.log("coming here",refreshToken);
     try {
       const tokenData = await getNewTokens(refreshToken);
+      console.log("tokenData",tokenData)
 
       if (tokenData) {
         const newReq = new NextRequest(req.url, {
@@ -400,6 +402,10 @@ export const proxy = async (req: NextRequest) => {
     }
   }
 
+
+
+
+
   // ============================================
   // Rule-4: Token আছে এবং valid
   // ============================================
@@ -407,7 +413,7 @@ export const proxy = async (req: NextRequest) => {
     const user = await getUserInfoMiddleware(req);
 
     if (user) {
-      console.log("user", user);
+      // console.log("user", user);
 
       if (user.emailVerified === false) {
         if (pathname !== "/verify-email") {

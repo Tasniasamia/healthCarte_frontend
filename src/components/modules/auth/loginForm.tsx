@@ -20,7 +20,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const LoginForm = ({redirect}:{redirect?:string|object}) => {
-  console.log("redirect",redirect);
+  // console.log("redirect",redirect);
   const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -47,17 +47,17 @@ const LoginForm = ({redirect}:{redirect?:string|object}) => {
         const loginResponse = await mutateAsync(value);
 
         if ("success" in loginResponse && !loginResponse.success) {
-          console.log("coming here");
-          console.log("loginResponse not success: ", loginResponse.message);
+          // console.log("coming here");
+          // console.log("loginResponse not success: ", loginResponse.message);
           setServerError(loginResponse.message);
           return;
         }
       } catch (error: unknown) {
         if (error && typeof error === "object" && "message" in error) {
-          console.log("catch message", (error as { message?: string }).message);
+          // console.log("catch message", (error as { message?: string }).message);
           setServerError((error as { message?: string }).message ?? "An unexpected error occurred");
         } else {
-          console.log("catch message", error);
+          // console.log("catch message", error);
           setServerError("An unexpected error occurred");
         }
       }

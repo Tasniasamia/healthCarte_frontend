@@ -12,8 +12,7 @@ export const getNewTokens = async (refreshToken: string) => {
         headers: { Cookie: `refreshToken=${refreshToken}` },
       }
     );
-
-    if (!res.ok) return null;
+   if (!res.ok) return null;
     const responseData = await res.json();
     if (!responseData?.success) return null;
 

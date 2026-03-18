@@ -21,7 +21,7 @@ export const createRegisterAction = async (payload: IRegisterPayloadType):Promis
       payload
     );
     const { success , message, data } = await response.data;
-    console.log("responsedata",response?.data)
+    // console.log("responsedata",response?.data)
     
     return {...response};
   } catch (error: any) {

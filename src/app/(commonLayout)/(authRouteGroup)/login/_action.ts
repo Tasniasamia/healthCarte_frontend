@@ -22,9 +22,9 @@ export const createLoginAction = async (payload: ILoginPayloadType,redirectURL:s
       "/auth/login",
       payload
     );
-    console.log("response data",response);
+    // console.log("response data",response);
     const { accessToken, refreshToken, token ,user} = await response.data;
-    console.log("response",response?.data);
+    // console.log("response",response?.data);
     await setTokenInCookie("accessToken", accessToken,(process?.env.ACCESS_TOKEN_SECRET as string));
     await setTokenInCookie("refreshToken", refreshToken,(process?.env.REFRESH_TOKEN_SECRET as string));
     await setTokenInCookie("better-auth.session_token", token);

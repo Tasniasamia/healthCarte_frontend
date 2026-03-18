@@ -10,7 +10,7 @@ export function Posts() {
   
     if (isLoading) return <p>Loading...</p>
     if (isError) return <p>কিছু একটা সমস্যা হয়েছে</p>
-  console.log("data",data)
+  // console.log("data",data)
     return (
       <ul>
         {data?.map((doctor:any) => (

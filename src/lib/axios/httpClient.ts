@@ -32,7 +32,7 @@ async function tryRefreshToken(
       await setTokenInCookie("better-auth.session_token", tokenData?.sessionToken);
 
   } catch (error : any) {
-      console.error("Error refreshing token in http client:", error);
+    //   console.error("Error refreshing token in http client:", error);
   }
 }
 const axiosInstance = async () => {
