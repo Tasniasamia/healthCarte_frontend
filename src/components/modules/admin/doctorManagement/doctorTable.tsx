@@ -15,7 +15,7 @@ const DoctorTable = ({
   urlQuerires: string;
   searchQueries: Record<string, string>;
 }) => {
-  const { data, isLoading,isFetching,isPending } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["doctors", searchQueries],
     queryFn: () => getAllDoctors(urlQuerires),
   });
@@ -29,13 +29,14 @@ const DoctorTable = ({
       <DataTable
         data={data?.data ?? []}
         columns={doctorColumn as ColumnDef<IDoctor>[]}
-        loading={isLoading || isFetching || isPending}
+        loading={isLoading}
         actions={{ onEdit: handleEdit, onView: handleView, onDelete: handleDelete }}
         emptyMessage="No doctors found"
         meta={data?.meta}
-        // ✅ searchQueries থেকে sorting state pass করো
         sortBy={searchQueries?.sortBy}
         sortOrder={searchQueries?.sortOrder as "asc" | "desc"}
+        searchable={true}                          // ✅ search চালু
+        searchPlaceholder="Search doctors..."      // ✅ placeholder
       />
     </div>
   );

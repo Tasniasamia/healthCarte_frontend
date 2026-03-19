@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Pagination from "./tablePagination";
+import SearchInput from "./searchInput";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
@@ -41,8 +42,10 @@ interface ICustomTableProps<TData> {
   loading: boolean;
   emptyMessage?: string;
   meta?: IMeta;
-  sortBy?: string;      // ✅ searchParams থেকে আসবে
-  sortOrder?: "asc" | "desc"; // ✅ searchParams থেকে আসবে
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  searchable?: boolean;         // ✅ search enable করবে কিনা
+  searchPlaceholder?: string;   // ✅ placeholder customize
 }
 
 export default function DataTable<TData>({
@@ -54,6 +57,8 @@ export default function DataTable<TData>({
   meta,
   sortBy,
   sortOrder,
+  searchable = false,
+  searchPlaceholder,
 }: ICustomTableProps<TData>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -70,11 +75,9 @@ export default function DataTable<TData>({
     [router, pathname, searchParams],
   );
 
-  // ✅ searchParams থেকে TanStack sorting state বানাও
   const sorting: SortingState =
     sortBy ? [{ id: sortBy, desc: sortOrder === "desc" }] : [];
 
-  // ✅ TanStack sorting change → URL searchParams update
   const handleSortingChange = (
     updater: SortingState | ((prev: SortingState) => SortingState),
   ) => {
@@ -136,13 +139,18 @@ export default function DataTable<TData>({
     data,
     columns: newColumns,
     getCoreRowModel: getCoreRowModel(),
-    manualSorting: true,          // ✅ server-side sorting
+    manualSorting: true,
     state: { sorting },
     onSortingChange: handleSortingChange,
   });
 
   return (
-    <div className="relative w-full space-y-2">
+    <div className="relative w-full space-y-3">
+      {/* ✅ search bar — searchable=true হলেই দেখাবে */}
+      {searchable && (
+        <SearchInput placeholder={searchPlaceholder ?? "Search..."} />
+      )}
+
       {loading && (
         <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 flex items-center justify-center">
           <div className="flex items-center gap-2">
@@ -160,7 +168,6 @@ export default function DataTable<TData>({
                 {hg.headers.map((header) => (
                   <TableHead key={header.id}>
                     {header.column.getCanSort() ? (
-                      // ✅ sortable column
                       <button
                         type="button"
                         className="flex items-center gap-1 hover:text-foreground transition-colors select-none"
@@ -171,15 +178,14 @@ export default function DataTable<TData>({
                           header.getContext(),
                         )}
                         {header.column.getIsSorted() === "asc" ? (
-                          <ArrowUp className="h-3.5 w-3.5 cursor-pointer" />
+                          <ArrowUp className="h-3.5 w-3.5" />
                         ) : header.column.getIsSorted() === "desc" ? (
-                          <ArrowDown className="h-3.5 w-3.5 cursor-pointer" />
+                          <ArrowDown className="h-3.5 w-3.5" />
                         ) : (
-                          <ArrowUpDown className="h-3.5 w-3.5 opacity-40 cursor-pointer" />
+                          <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
                         )}
                       </button>
                     ) : (
-                      // ✅ non-sortable column
                       flexRender(
                         header.column.columnDef.header,
                         header.getContext(),
