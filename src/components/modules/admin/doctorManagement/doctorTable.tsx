@@ -7,6 +7,40 @@ import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { doctorColumn } from "./doctorColumn";
 import DataTable from "@/components/shared/table/dataTable";
+import FilterPanel, { FilterFieldConfig } from "@/components/shared/table/filterPanel";
+
+// ✅ doctor table র filter config
+const doctorFilters: FilterFieldConfig[] = [
+  {
+    type: "select",
+    key: "user.status",
+    label: "User Status",
+    placeholder: "All statuses",
+    options: [
+      { label: "Active", value: "ACTIVE" },
+      { label: "Blocked", value: "BLOCKED" },
+      { label: "Deleted", value: "DELETED" },
+    ],
+  },
+  {
+    type: "select",
+    key: "gender",
+    label: "Gender",
+    placeholder: "All genders",
+    options: [
+      { label: "Male", value: "MALE" },
+      { label: "Female", value: "FEMALE" },
+      { label: "Other", value: "OTHER" },
+    ],
+  },
+  {
+    type: "range",
+    label: "Appointment Fee",
+    gtKey: "appointmentFee[gt]",
+    ltKey: "appointmentFee[lt]",
+    placeholder: { gt: "Min", lt: "Max" },
+  },
+];
 
 const DoctorTable = ({
   urlQuerires,
@@ -35,8 +69,9 @@ const DoctorTable = ({
         meta={data?.meta}
         sortBy={searchQueries?.sortBy}
         sortOrder={searchQueries?.sortOrder as "asc" | "desc"}
-        searchable={true}                          // ✅ search চালু
-        searchPlaceholder="Search doctors..."      // ✅ placeholder
+        searchable={true}
+        searchPlaceholder="Search doctors..."
+        filterPanel={<FilterPanel filters={doctorFilters} />} // ✅
       />
     </div>
   );

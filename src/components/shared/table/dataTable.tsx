@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { ReactNode } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -44,8 +44,9 @@ interface ICustomTableProps<TData> {
   meta?: IMeta;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
-  searchable?: boolean;         // ✅ search enable করবে কিনা
-  searchPlaceholder?: string;   // ✅ placeholder customize
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  filterPanel?: ReactNode; // ✅ filter component slot
 }
 
 export default function DataTable<TData>({
@@ -59,6 +60,7 @@ export default function DataTable<TData>({
   sortOrder,
   searchable = false,
   searchPlaceholder,
+  filterPanel,
 }: ICustomTableProps<TData>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -83,16 +85,11 @@ export default function DataTable<TData>({
   ) => {
     const newSorting =
       typeof updater === "function" ? updater(sorting) : updater;
-
     if (newSorting.length === 0) {
       updateParams({ sortBy: "createdAt", sortOrder: "desc", page: "1" });
     } else {
       const { id, desc } = newSorting[0];
-      updateParams({
-        sortBy: id,
-        sortOrder: desc ? "desc" : "asc",
-        page: "1",
-      });
+      updateParams({ sortBy: id, sortOrder: desc ? "desc" : "asc", page: "1" });
     }
   };
 
@@ -103,31 +100,13 @@ export default function DataTable<TData>({
     cell: (info) => (
       <div className="flex gap-2">
         {actions?.onEdit && (
-          <button
-            type="button"
-            className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-gray-200 transition-colors"
-            onClick={() => actions.onEdit?.(info.row.original)}
-          >
-            Edit
-          </button>
+          <button type="button" className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-gray-200 transition-colors" onClick={() => actions.onEdit?.(info.row.original)}>Edit</button>
         )}
         {actions?.onView && (
-          <button
-            type="button"
-            className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-gray-200 transition-colors"
-            onClick={() => actions.onView?.(info.row.original)}
-          >
-            View
-          </button>
+          <button type="button" className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-gray-200 transition-colors" onClick={() => actions.onView?.(info.row.original)}>View</button>
         )}
         {actions?.onDelete && (
-          <button
-            type="button"
-            className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-red-100 hover:text-red-600 transition-colors"
-            onClick={() => actions.onDelete?.(info.row.original)}
-          >
-            Delete
-          </button>
+          <button type="button" className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-red-100 hover:text-red-600 transition-colors" onClick={() => actions.onDelete?.(info.row.original)}>Delete</button>
         )}
       </div>
     ),
@@ -146,9 +125,15 @@ export default function DataTable<TData>({
 
   return (
     <div className="relative w-full space-y-3">
-      {/* ✅ search bar — searchable=true হলেই দেখাবে */}
-      {searchable && (
-        <SearchInput placeholder={searchPlaceholder ?? "Search..."} />
+
+      {/* ✅ toolbar — search + filter একসাথে */}
+      {(searchable || filterPanel) && (
+        <div className="flex items-center gap-2">
+          {searchable && (
+            <SearchInput placeholder={searchPlaceholder ?? "Search..."} />
+          )}
+          {filterPanel && filterPanel}
+        </div>
       )}
 
       {loading && (
@@ -168,15 +153,8 @@ export default function DataTable<TData>({
                 {hg.headers.map((header) => (
                   <TableHead key={header.id}>
                     {header.column.getCanSort() ? (
-                      <button
-                        type="button"
-                        className="flex items-center gap-1 hover:text-foreground transition-colors select-none"
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                      <button type="button" className="flex items-center gap-1 hover:text-foreground transition-colors select-none" onClick={header.column.getToggleSortingHandler()}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getIsSorted() === "asc" ? (
                           <ArrowUp className="h-3.5 w-3.5" />
                         ) : header.column.getIsSorted() === "desc" ? (
@@ -186,10 +164,7 @@ export default function DataTable<TData>({
                         )}
                       </button>
                     ) : (
-                      flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )
+                      flexRender(header.column.columnDef.header, header.getContext())
                     )}
                   </TableHead>
                 ))}
@@ -203,20 +178,14 @@ export default function DataTable<TData>({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="p-4">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={newColumns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={newColumns.length} className="h-24 text-center">
                   {emptyMessage || "No data available."}
                 </TableCell>
               </TableRow>
