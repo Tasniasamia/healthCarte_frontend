@@ -6,6 +6,7 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  SortingState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -16,6 +17,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Pagination from "./tablePagination";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
+import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 
 interface IMeta {
   page: number;
@@ -36,7 +40,9 @@ interface ICustomTableProps<TData> {
   actions?: ActionsType<TData>;
   loading: boolean;
   emptyMessage?: string;
-  meta?: IMeta; // ✅ নতুন
+  meta?: IMeta;
+  sortBy?: string;      // ✅ searchParams থেকে আসবে
+  sortOrder?: "asc" | "desc"; // ✅ searchParams থেকে আসবে
 }
 
 export default function DataTable<TData>({
@@ -45,11 +51,52 @@ export default function DataTable<TData>({
   actions,
   loading,
   emptyMessage,
-  meta, // ✅ নতুন
+  meta,
+  sortBy,
+  sortOrder,
 }: ICustomTableProps<TData>) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const updateParams = useCallback(
+    (updates: Record<string, string>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(updates).forEach(([key, value]) => {
+        params.set(key, value);
+      });
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [router, pathname, searchParams],
+  );
+
+  // ✅ searchParams থেকে TanStack sorting state বানাও
+  const sorting: SortingState =
+    sortBy ? [{ id: sortBy, desc: sortOrder === "desc" }] : [];
+
+  // ✅ TanStack sorting change → URL searchParams update
+  const handleSortingChange = (
+    updater: SortingState | ((prev: SortingState) => SortingState),
+  ) => {
+    const newSorting =
+      typeof updater === "function" ? updater(sorting) : updater;
+
+    if (newSorting.length === 0) {
+      updateParams({ sortBy: "createdAt", sortOrder: "desc", page: "1" });
+    } else {
+      const { id, desc } = newSorting[0];
+      updateParams({
+        sortBy: id,
+        sortOrder: desc ? "desc" : "asc",
+        page: "1",
+      });
+    }
+  };
+
   const actionColumn: ColumnDef<TData> = {
     id: "actions",
     header: "Actions",
+    enableSorting: false,
     cell: (info) => (
       <div className="flex gap-2">
         {actions?.onEdit && (
@@ -89,6 +136,9 @@ export default function DataTable<TData>({
     data,
     columns: newColumns,
     getCoreRowModel: getCoreRowModel(),
+    manualSorting: true,          // ✅ server-side sorting
+    state: { sorting },
+    onSortingChange: handleSortingChange,
   });
 
   return (
@@ -109,9 +159,31 @@ export default function DataTable<TData>({
               <TableRow key={hg.id}>
                 {hg.headers.map((header) => (
                   <TableHead key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
+                    {header.column.getCanSort() ? (
+                      // ✅ sortable column
+                      <button
+                        type="button"
+                        className="flex items-center gap-1 hover:text-foreground transition-colors select-none"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                        {header.column.getIsSorted() === "asc" ? (
+                          <ArrowUp className="h-3.5 w-3.5 cursor-pointer" />
+                        ) : header.column.getIsSorted() === "desc" ? (
+                          <ArrowDown className="h-3.5 w-3.5 cursor-pointer" />
+                        ) : (
+                          <ArrowUpDown className="h-3.5 w-3.5 opacity-40 cursor-pointer" />
+                        )}
+                      </button>
+                    ) : (
+                      // ✅ non-sortable column
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )
                     )}
                   </TableHead>
                 ))}
@@ -147,7 +219,6 @@ export default function DataTable<TData>({
         </Table>
       </div>
 
-      {/* ✅ meta থাকলে pagination দেখাবে */}
       {meta && (
         <Pagination
           page={meta.page}
