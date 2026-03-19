@@ -47,6 +47,7 @@ interface ICustomTableProps<TData> {
   searchable?: boolean;
   searchPlaceholder?: string;
   filterPanel?: ReactNode; // ✅ filter component slot
+  toolbarAction?: ReactNode;
 }
 
 export default function DataTable<TData>({
@@ -61,6 +62,7 @@ export default function DataTable<TData>({
   searchable = false,
   searchPlaceholder,
   filterPanel,
+  toolbarAction
 }: ICustomTableProps<TData>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -126,13 +128,22 @@ export default function DataTable<TData>({
   return (
     <div className="relative w-full space-y-3">
 
-      {/* ✅ toolbar — search + filter একসাথে */}
-      {(searchable || filterPanel) && (
-        <div className="flex items-center gap-2">
-          {searchable && (
-            <SearchInput placeholder={searchPlaceholder ?? "Search..."} />
+     {(searchable || filterPanel || toolbarAction) && (
+        <div className="flex items-center justify-between gap-2">
+          {/* বাম — search + filter */}
+          <div className="flex items-center gap-2">
+            {searchable && (
+              <SearchInput placeholder={searchPlaceholder ?? "Search..."} />
+            )}
+            {filterPanel && filterPanel}
+          </div>
+ 
+          {/* ডান — Add button বা যেকোনো action */}
+          {toolbarAction && (
+            <div className=" ">
+              {toolbarAction}
+            </div>
           )}
-          {filterPanel && filterPanel}
         </div>
       )}
 

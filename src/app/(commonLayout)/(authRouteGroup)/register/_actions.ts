@@ -21,11 +21,11 @@ export const createRegisterAction = async (payload: IRegisterPayloadType):Promis
       payload
     );
     const { success , message, data } = await response.data;
-    console.log("responsedata",response?.data)
+    // console.log("responsedata",response?.data)
     
     return {...response};
   } catch (error: any) {
-    console.log("error:any",error?.message);
+    // console.log("error:any",error?.message);
     return {
       success: false,
       message: `Login failed: ${error?.message}`,

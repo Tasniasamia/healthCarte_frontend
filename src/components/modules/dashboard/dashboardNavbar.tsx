@@ -6,7 +6,7 @@ import { defaultRoute } from '@/lib/auth.utils';
 
 const DashboardNavbar =async () => {
     const userInfo=await getUserInfo();
-    console.log("userInfo",userInfo);
+    // console.log("userInfo",userInfo);
     const dashboardHome=defaultRoute(userInfo?.role as string);
     return (
         <div>

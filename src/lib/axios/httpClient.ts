@@ -86,18 +86,19 @@ const httpPost = async <TData>(
   endPoint: string,
   payload: Record<string, any>,
   options?: ApiRequestOptions
-):Promise<ApiResponse<TData>> => {
-  try {    
-    const instance = await axiosInstance();       
-    const response = await instance.post<ApiResponse<TData>>(endPoint,payload,{
-        params: options?.params,
-        headers: options?.headers,
+): Promise<ApiResponse<TData>> => {
+  try {
+    const instance = await axiosInstance();
+    const response = await instance.post<ApiResponse<TData>>(endPoint, payload, {
+      params: options?.params,
+      headers: options?.headers,
     });
     return response.data;
-} catch (error) {       
-    console.error(`GET request to ${endPoint} failed:`, error);
+  } catch (error: any) {
+    // ✅ এটা যোগ করো — backend এর actual validation message দেখাবে
+    console.error("Backend error response:", error?.response?.data);
     throw error;
-}
+  }
 };
 
 export const httpClient = {

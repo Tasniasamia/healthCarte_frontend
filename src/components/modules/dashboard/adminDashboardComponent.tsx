@@ -12,7 +12,7 @@ const AdminDashboardComponent = () => {
         queryFn:()=>getDashboardData()
 
     });
-    console.log("data",data);
+    // console.log("data",data);
     return (
         <div>
         <StatsCard

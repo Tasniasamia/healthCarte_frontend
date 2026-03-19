@@ -407,7 +407,7 @@ export const proxy = async (req: NextRequest) => {
     const user = await getUserInfoMiddleware(req);
 
     if (user) {
-      console.log("user", user);
+      // console.log("user", user);
 
       if (user.emailVerified === false) {
         if (pathname !== "/verify-email") {

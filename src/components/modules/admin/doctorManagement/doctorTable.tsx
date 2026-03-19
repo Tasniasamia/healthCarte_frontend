@@ -8,6 +8,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { doctorColumn } from "./doctorColumn";
 import DataTable from "@/components/shared/table/dataTable";
 import FilterPanel, { FilterFieldConfig } from "@/components/shared/table/filterPanel";
+import AddDoctorModal from "./addDoctorModal";
 
 // ✅ doctor table র filter config
 const doctorFilters: FilterFieldConfig[] = [
@@ -72,6 +73,8 @@ const DoctorTable = ({
         searchable={true}
         searchPlaceholder="Search doctors..."
         filterPanel={<FilterPanel filters={doctorFilters} />} // ✅
+                toolbarAction={<AddDoctorModal />} // ✅ Add Doctor button
+
       />
     </div>
   );

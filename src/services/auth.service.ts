@@ -61,7 +61,7 @@ export async function getUserInfo() {
         },
       }
     );
-    console.log("res", res);
+    // console.log("res", res);
 
     if (!res.ok) {
       console.error(
@@ -73,7 +73,7 @@ export async function getUserInfo() {
     }
 
     const { data } = await res.json();
-    console.log("data", data);
+    // console.log("data", data);
 
     return data;
   } catch (error) {
@@ -106,7 +106,7 @@ export async function getUserInfoMiddleware(req: NextRequest) {
 
 
       const {data}= await res.json();
-      console.log("data",data);
+      // console.log("data",data);
       return data;
 
   } catch (error) {
