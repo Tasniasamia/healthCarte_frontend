@@ -7,7 +7,6 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -16,8 +15,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Pagination from "./tablePagination";
 
-interface actionsType<T> {
+interface IMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+interface ActionsType<T> {
   onEdit?: (payload: T) => void;
   onView?: (payload: T) => void;
   onDelete?: (payload: T) => void;
@@ -26,9 +33,10 @@ interface actionsType<T> {
 interface ICustomTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData>[];
-  actions?: actionsType<TData>;
+  actions?: ActionsType<TData>;
   loading: boolean;
   emptyMessage?: string;
+  meta?: IMeta; // ✅ নতুন
 }
 
 export default function DataTable<TData>({
@@ -37,15 +45,17 @@ export default function DataTable<TData>({
   actions,
   loading,
   emptyMessage,
+  meta, // ✅ নতুন
 }: ICustomTableProps<TData>) {
   const actionColumn: ColumnDef<TData> = {
     id: "actions",
     header: "Actions",
-    cell: (info): any => (
+    cell: (info) => (
       <div className="flex gap-2">
         {actions?.onEdit && (
           <button
-            className="cursor-pointer"
+            type="button"
+            className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-gray-200 transition-colors"
             onClick={() => actions.onEdit?.(info.row.original)}
           >
             Edit
@@ -53,7 +63,8 @@ export default function DataTable<TData>({
         )}
         {actions?.onView && (
           <button
-            className="cursor-pointer"
+            type="button"
+            className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-gray-200 transition-colors"
             onClick={() => actions.onView?.(info.row.original)}
           >
             View
@@ -61,7 +72,8 @@ export default function DataTable<TData>({
         )}
         {actions?.onDelete && (
           <button
-            className="cursor-pointer"
+            type="button"
+            className="cursor-pointer px-3 py-1 text-sm rounded hover:bg-red-100 hover:text-red-600 transition-colors"
             onClick={() => actions.onDelete?.(info.row.original)}
           >
             Delete
@@ -80,7 +92,7 @@ export default function DataTable<TData>({
   });
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full space-y-2">
       {loading && (
         <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 flex items-center justify-center">
           <div className="flex items-center gap-2">
@@ -134,6 +146,16 @@ export default function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
+
+      {/* ✅ meta থাকলে pagination দেখাবে */}
+      {meta && (
+        <Pagination
+          page={meta.page}
+          limit={meta.limit}
+          total={meta.total}
+          totalPages={meta.totalPages}
+        />
+      )}
     </div>
   );
 }

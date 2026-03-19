@@ -18,8 +18,8 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
       return (
         <div className="flex items-center gap-2">
           <Image
-            src={row.original.profilePhoto || ""}
-            alt={row.original.name}
+            src={row.original?.profilePhoto || ""}
+            alt={row.original?.name}
             width={40}
             height={40}
           />
@@ -34,7 +34,7 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
     header: "Email",
     cell: ({ row }) => {
         return (
-          <div>{row.original.email}</div>
+          <div>{row.original?.email}</div>
         )
       },  
     
@@ -44,9 +44,9 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
         accessorKey: "specialities",
         header: "Specialties",
         cell: ({ row }) => {
-          const specialties = row.original.specialities
+          const specialties = row.original?.specialities
       
-          if (!specialties || specialties.length === 0) {
+          if (!specialties || specialties?.length === 0) {
             return (
               <span className="text-xs text-muted-foreground">
                 No Specialties
@@ -57,7 +57,7 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
           return (
             <div className="flex flex-wrap gap-1">
               {specialties.map((item, index) => {
-                const title = item.specialty?.title || "N/A"
+                const title = item?.specialty?.title || "N/A"
       
                 return (
                   <Badge variant="secondary" key={index}>
@@ -86,7 +86,7 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
         cell: ({ row }) => {
           return (
             <span className="text-sm font-medium">
-              {row.original.experience ?? 0} years
+              {row.original?.experience ?? 0} years
             </span>
           );
         },
@@ -112,7 +112,7 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
               <span className="text-sm font-medium">
-                {row.original.avaerageRating?.toFixed(1) || "0.0"}
+                {row.original?.avaerageRating?.toFixed(1) || "0.0"}
               </span>
             </div>
           );
@@ -125,7 +125,7 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
         cell: ({ row }) => {
           return (
             <span className="text-sm capitalize">
-              {row.original.gender.toLowerCase()}
+              {row.original?.gender.toLowerCase()}
             </span>
           );
         },
@@ -136,7 +136,7 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
         header: "Status",
         cell: ({ row }) => {
           return (
-            <StatusBadgeCell status={row.original.user.status} />
+            <StatusBadgeCell status={row.original?.user?.status} />
           );
         },
       },
@@ -146,7 +146,7 @@ export const doctorColumn: ColumnDef<IDoctor>[] = [
         header: "Joined On",
         cell: ({ row }) => {
           return (
-            <div>{dayjs(row.original.createdAt).format('DD/MM/YYYY')}</div>
+            <div>{dayjs(row.original?.createdAt).format('DD/MM/YYYY')}</div>
           );
         },
       },

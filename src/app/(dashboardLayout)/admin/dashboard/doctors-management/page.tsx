@@ -14,6 +14,7 @@ import DoctorTable from '@/components/modules/admin/doctorManagement/doctorTable
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const searchQueries = await searchParams;
+  searchQueries['include']='specialities.specialty,user,doctorSchedules';
     console.log("searchQueries",searchQueries);
 
   const urlQuerires=Object.keys(searchQueries)?.map((key:string)=>{
