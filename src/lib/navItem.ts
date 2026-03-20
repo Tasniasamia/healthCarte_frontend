@@ -121,7 +121,7 @@ export const getAdminNavItems = ():INavItem[] => {
           
                 {
                     label: "Doctor Schedules",
-                    href: "/admin/dashboard/doctor-schedules-managament",
+                    href: "/admin/dashboard/doctor-schedules-management",
                     icon: "CalendarClock",
                 },
                 {

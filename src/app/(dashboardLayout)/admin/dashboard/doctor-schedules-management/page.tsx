@@ -1,11 +1,11 @@
 import React from 'react';
 
-const DoctorSchedulesManagement = () => {
-    return (
-        <div>
-            
-        </div>
-    );
+const page = () => {
+  return (
+    <div>
+      
+    </div>
+  );
 };
 
-export default DoctorSchedulesManagement;
+export default page;

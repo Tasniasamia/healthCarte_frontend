@@ -203,7 +203,7 @@ const httpPost = async <TData>(
   }
 };
 
-// ✅ নতুন patch method
+// ✅ নতুন put method
 const httpPut = async <TData>(
   endPoint: string,
   payload: Record<string, any>,
@@ -221,6 +221,45 @@ const httpPut = async <TData>(
     throw error;
   }
 };
+
+
+
+
+// ✅ নতুন patch method
+const httpPatch = async <TData>(
+  endPoint: string,
+  payload: Record<string, any>,
+  options?: ApiRequestOptions
+): Promise<ApiResponse<TData>> => {
+  try {
+    const instance = await axiosInstance();
+    const response = await instance.patch<ApiResponse<TData>>(endPoint, payload, {
+      params: options?.params,
+      headers: options?.headers,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Backend error response:", error?.response?.data);
+    throw error;
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ✅ delete method
 const httpDelete = async <TData>(
@@ -245,4 +284,5 @@ export const httpClient = {
   post: httpPost,
   put: httpPut,
   delete: httpDelete, // ✅
+  patch:httpPatch
 };

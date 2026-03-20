@@ -1,11 +1,26 @@
-import React from 'react';
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { getMySchedules } from "@/services/doctorSchedule.service";
+import DoctorScheduleTable from "@/components/modules/doctor/doctorSchedule/doctorscheduletable";
 
-const MySchedules = () => {
-    return (
-        <div>
-            
-        </div>
-    );
-};
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const searchQueries = await searchParams;
 
-export default MySchedules;
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["mySchedules", searchQueries],
+    queryFn: getMySchedules,
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <DoctorScheduleTable
+        searchQueries={searchQueries as Record<string, string>}
+      />
+    </HydrationBoundary>
+  );
+}
