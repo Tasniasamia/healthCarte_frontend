@@ -14,7 +14,7 @@ const UserDropdown = ({ userInfo }: UserDropdownProps) => {
         <DropdownMenuTrigger asChild>
             <Button variant={"outline"} size={"icon"} className="rounded-full">
                 <span className="text-sm font-semibold">
-                    {userInfo.name.charAt(0).toUpperCase()}
+                    {userInfo?.name.charAt(0).toUpperCase()}
                 </span>
             </Button>
         </DropdownMenuTrigger>
@@ -24,15 +24,15 @@ const UserDropdown = ({ userInfo }: UserDropdownProps) => {
             <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">
-                        {userInfo.name}
+                        {userInfo?.name}
                     </p>
 
                     <p className="text-xs text-muted-foreground">
-                        {userInfo.email}
+                        {userInfo?.email}
                     </p>
 
                     <p className="text-xs text-primary capitalize">
-                        {userInfo.role.toLowerCase().replace("_", " ")}
+                        {userInfo?.role.toLowerCase().replace("_", " ")}
                     </p>
                 </div>
             </DropdownMenuLabel>

@@ -80,16 +80,16 @@ export const getAllDoctors = async (urlQuerires: string) => {
 };
 
 // ✅ single doctor fetch
-export const getDoctorById = async (id: string) => {
-  try {
-    const response = await httpClient.get<IDoctor>(`/doctor/${id}`);
-    if (!response.success) throw new Error("Failed to fetch doctor");
-    return response;
-  } catch (error) {
-    console.error("Failed to fetch doctor", error);
-    throw error;
-  }
-};
+// export const getDoctorById = async (id: string) => {
+//   try {
+//     const response = await httpClient.get<IDoctor>(`/doctor/${id}`);
+//     if (!response.success) throw new Error("Failed to fetch doctor");
+//     return response;
+//   } catch (error) {
+//     console.error("Failed to fetch doctor", error);
+//     throw error;
+//   }
+// };
 
 export const getAllSpecialities = async () => {
   try {
@@ -133,6 +133,19 @@ export const deleteDoctor = async (id: string) => {
     return response;
   } catch (error) {
     console.error("Failed to delete doctor", error);
+    throw error;
+  }
+};
+
+
+export const getDoctorById = async (id: string) => {
+  try{
+  const response = await httpClient.get<IDoctor>(`/doctor/${id}`
+  );
+    if (!response.success) throw new Error("Failed to fetch doctors");
+    return response;
+  } catch (error) {
+    console.error("Failed to fetch doctors", error);
     throw error;
   }
 };
